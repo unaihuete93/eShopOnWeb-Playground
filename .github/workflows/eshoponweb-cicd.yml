@@ -43,7 +43,7 @@ jobs:
       uses: microsoft/security-devops-action@preview
       id: msdo
       env:
-        GDN_TEMPLATEANALYZER_ANALYZEDIRECTORY: ${{ env.GITHUB_WORKSPACE }}/.azure/bicep
+        GDN_TEMPLATEANALYZER_ANALYZEDIRECTORY: ${{ github.workspace }}/.azure/bicep
       with:
         categories: 'IaC, containers'
 
