@@ -1,1 +1,48 @@
+name: eshoponweb-ci
+
+on:
+	push:
+		branches:
+			- main
+
+jobs:
+	build:
+		name: Build .NET Core Solution
+		runs-on: ubuntu-latest
+
+		env:
+			ARTIFACT_STAGING_DIR: ${{ github.workspace }}/artifacts/website
+
+		steps:
+			- name: Checkout
+				uses: actions/checkout@v4
+
+			- name: Setup .NET
+				uses: actions/setup-dotnet@v4
+				with:
+					global-json-file: global.json
+
+			- name: Restore
+				run: dotnet restore **/*.sln
+
+			- name: Build
+				run: dotnet build **/*.sln --no-restore
+
+			- name: Test
+				run: dotnet test tests/UnitTests/UnitTests.csproj --no-build
+
+			- name: Publish
+				run: dotnet publish src/Web/Web.csproj -o "$ARTIFACT_STAGING_DIR"
+
+			- name: Publish Artifacts GH - Website
+				uses: actions/upload-artifact@v4
+				with:
+					name: Website
+					path: ${{ env.ARTIFACT_STAGING_DIR }}
+
+			- name: Publish Artifacts GH - Bicep
+				uses: actions/upload-artifact@v4
+				with:
+					name: Bicep
+					path: .azure/bicep/webapp.bicep
 
